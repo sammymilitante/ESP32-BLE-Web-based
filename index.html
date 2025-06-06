@@ -1,11 +1,3 @@
-<!--
-  Rui Santos
-  Complete project details at https://RandomNerdTutorials.com/esp32-web-bluetooth/
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files.
-  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
--->
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,26 +6,31 @@
     <link rel="icon" type="image/png" href="">
 </head>
 <body>
-  <h1>ESP32 Web BLE Application</h1>
+  <h1>ESP32 Motor Control Web-based BLE Application</h1>
   <button id="connectBleButton">Connect to BLE Device</button>
   <button id="disconnectBleButton">Disconnect BLE Device</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
   <h2>Fetched Value</h2>
   <p><span id="valueContainer">NaN</span></p>
   <p>Last reading: <span id="timestamp"></span></p>
-  <h2>Control GPIO 2</h2>
-  <button id="onButton">ON</button>
-  <button id="offButton">OFF</button>
+  <h2>ESP32 Motor Control</h2>
+  <button id="forwardButton">FORWARD</button>
+  <button id="stopButton">STOP</button>
+  <button id="leftButton">LEFT</button>
+  <button id="rightButton">RIGHT</button>
+  <button id="reverseButton">REVERSE</button>
   <p>Last value sent: <span id="valueSent"></span></p>
-  <p><a href="https://randomnerdtutorials.com/">Created by RandomNerdTutorials.com</a></p>
-  <p><a href="https://RandomNerdTutorials.com/esp32-web-bluetooth/">Read the full project here.</a></p>
+  <p><a href="https://sammymilitante.github.io/ESP32-BLE-Web-based/">Created ESP32 Motor Control Web-based BLE Application</a></p>
 </body>
 <script>
     // DOM Elements
     const connectButton = document.getElementById('connectBleButton');
     const disconnectButton = document.getElementById('disconnectBleButton');
-    const onButton = document.getElementById('onButton');
-    const offButton = document.getElementById('offButton');
+    const forwardButton = document.getElementById('forwardButton');
+    const stopButton = document.getElementById('stopButton');
+    const leftButton = document.getElementById('leftButton');
+    const rightButton = document.getElementById('rightButton');
+    const reverseButton = document.getElementById('reverseButton');
     const retrievedValue = document.getElementById('valueContainer');
     const latestValueSent = document.getElementById('valueSent');
     const bleStateContainer = document.getElementById('bleState');
@@ -61,8 +58,11 @@
     disconnectButton.addEventListener('click', disconnectDevice);
 
     // Write to the ESP32 LED Characteristic
-    onButton.addEventListener('click', () => writeOnCharacteristic(1));
-    offButton.addEventListener('click', () => writeOnCharacteristic(0));
+    forwardButton.addEventListener('click', () => writeOnCharacteristic(1));
+    leftButton.addEventListener('click', () => writeOnCharacteristic(2));
+    rightButton.addEventListener('click', () => writeOnCharacteristic(3));
+    reverseButton.addEventListener('click', () => writeOnCharacteristic(4));
+    stopButton.addEventListener('click', () => writeOnCharacteristic(0));
 
     // Check if BLE is available in your Browser
     function isWebBluetoothEnabled() {
@@ -137,16 +137,16 @@
         if (bleServer && bleServer.connected) {
             bleServiceFound.getCharacteristic(ledCharacteristic)
             .then(characteristic => {
-                console.log("Found the LED characteristic: ", characteristic.uuid);
+                console.log("Found the Motor characteristic: ", characteristic.uuid);
                 const data = new Uint8Array([value]);
                 return characteristic.writeValue(data);
             })
             .then(() => {
                 latestValueSent.innerHTML = value;
-                console.log("Value written to LEDcharacteristic:", value);
+                console.log("Value written to Motor characteristic:", value);
             })
             .catch(error => {
-                console.error("Error writing to the LED characteristic: ", error);
+                console.error("Error writing to the Motor characteristic: ", error);
             });
         } else {
             console.error ("Bluetooth is not connected. Cannot write to characteristic.")
